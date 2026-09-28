@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#062c46" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.svg" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Round the Island Companion</title>
+</head>
+<body>
+  <div class="ocean-bg"></div>
+
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">ROUND THE ISLAND</div>
+      <h1>REGATTA COMPANION</h1>
+    </div>
+    <button id="resetRaceBtn" class="icon-btn danger" aria-label="Reset race">↻</button>
+  </header>
+
+  <main class="app-shell">
+    <section class="hero-card">
+      <div class="wind-panel">
+        <div class="section-label">CURRENT WIND</div>
+        <div class="compass-wrap">
+          <div class="compass">
+            <div class="cardinal n">N</div>
+            <div class="cardinal e">E</div>
+            <div class="cardinal s">S</div>
+            <div class="cardinal w">W</div>
+            <div id="windArrow" class="wind-arrow">➤</div>
+            <div class="compass-center">⚓</div>
+          </div>
+        </div>
+        <div class="wind-readout">
+          <button id="windLeftBtn" class="small-btn">−45°</button>
+          <strong id="windDirectionText">W</strong>
+          <button id="windRightBtn" class="small-btn">+45°</button>
+        </div>
+      </div>
+
+      <div class="turn-panel">
+        <div class="section-label">RACE CONTROL</div>
+        <div id="turnPlayerName" class="turn-name">Add players</div>
+        <div id="turnStatus" class="turn-status">Set up the fleet to begin.</div>
+        <button id="nextTurnBtn" class="primary-btn" disabled>Next Turn ⛵</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div>
+          <div class="section-label">FLEET</div>
+          <h2>Yachts</h2>
+        </div>
+        <button id="addPlayerBtn" class="secondary-btn">+ Add Yacht</button>
+      </div>
+      <div id="playersList" class="players-list"></div>
+    </section>
+
+    <section class="panel hidden" id="turnControls">
+      <div class="panel-heading">
+        <div>
+          <div class="section-label">ACTIVE YACHT</div>
+          <h2 id="activeYachtHeading">Your Turn</h2>
+        </div>
+        <span id="penaltyBadge" class="status-badge hidden"></span>
+      </div>
+
+      <div class="grid-2">
+        <div class="control-card">
+          <label for="legSelect">Current board leg</label>
+          <select id="legSelect">
+            <option value="E">Eastbound</option>
+            <option value="S">Southbound</option>
+            <option value="W">Westbound</option>
+            <option value="N">Northbound</option>
+          </select>
+          <div id="pointOfSailBox" class="info-box">
+            <span class="big">—</span>
+            <small>Point of sail</small>
+          </div>
+        </div>
+
+        <div class="control-card">
+          <label>Sail choice</label>
+          <div class="sail-grid">
+            <button class="sail-btn active" data-sail="Jib">
+              <span class="sail-icon">◢</span>
+              <span>Jib</span>
+            </button>
+            <button class="sail-btn" data-sail="Genoa">
+              <span class="sail-icon">◣</span>
+              <span>Genoa</span>
+            </button>
+            <button class="sail-btn" data-sail="Spinnaker">
+              <span class="sail-icon">◉</span>
+              <span>Spinnaker</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="movement-card">
+        <div>
+          <div class="section-label">MOVEMENT ALLOWANCE</div>
+          <div id="movementValue" class="movement-value">0</div>
+        </div>
+        <div class="movement-copy">
+          Calculated from your <strong>point of sail at the start of the turn</strong>. Complete the full move even if you round a corner.
+        </div>
+      </div>
+
+      <div class="event-grid">
+        <button class="event-btn gust" data-event="luckyGust">Lucky Gust<br><small>+2 movement</small></button>
+        <button class="event-btn tide" data-event="favourableTide">Favourable Tide<br><small>+2 movement</small></button>
+        <button class="event-btn calm" data-event="calmPatch">Calm Patch<br><small>−2 next turn</small></button>
+        <button class="event-btn dirty" data-event="dirtyAir">Dirty Air<br><small>−1 next turn</small></button>
+        <button class="event-btn rocks" data-event="rocks">Rocks<br><small>−1 next turn</small></button>
+        <button class="event-btn capsize" data-event="capsize">CAPSIZE<br><small>miss next turn</small></button>
+        <button class="event-btn squall" id="drawRaceCardBtn">Race Card<br><small>draw event</small></button>
+        <button class="event-btn wind" id="drawWindCardBtn">Wind Card<br><small>change conditions</small></button>
+      </div>
+
+      <div id="eventMessage" class="event-message hidden"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-label">REFERENCE</div>
+      <h2>Point of Sail</h2>
+      <div class="reference-table">
+        <div><span>Broad Reach</span><strong>5</strong></div>
+        <div><span>Beam Reach</span><strong>4</strong></div>
+        <div><span>Running</span><strong>4</strong></div>
+        <div><span>Close Hauled</span><strong>3</strong></div>
+        <div><span>Into Wind</span><strong>0</strong></div>
+      </div>
+      <p class="footnote">Genoa: +1 when Close Hauled. Spinnaker: +2 on Broad Reach or Running.</p>
+    </section>
+  </main>
+
+  <dialog id="playerDialog">
+    <form method="dialog" class="dialog-card" id="playerForm">
+      <h3>Add Yacht</h3>
+      <label for="playerNameInput">Skipper / yacht name</label>
+      <input id="playerNameInput" maxlength="20" placeholder="e.g. Jim" required />
+      <label for="boatColorInput">Boat colour</label>
+      <select id="boatColorInput">
+        <option value="#ff5a5f">Red</option>
+        <option value="#38a3ff">Blue</option>
+        <option value="#ffd166">Yellow</option>
+        <option value="#4cd97b">Green</option>
+        <option value="#b18cff">Purple</option>
+        <option value="#f58bd8">Pink</option>
+      </select>
+      <div class="dialog-actions">
+        <button value="cancel" class="secondary-btn">Cancel</button>
+        <button id="savePlayerBtn" value="default" class="primary-btn">Add</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
